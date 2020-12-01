@@ -1,0 +1,107 @@
+const fs = require('fs');
+const reportHtml = require('./report-html');
+const reportGithubActions = require('./report-github-actions');
+
+/**
+ * Custom Jest Reporter, for student-facing test reports.
+ * 
+ * Generates an HTML report at ./test-report.html.
+ * 
+ * Test include "hints" for students, instead of full error stacks
+ * We're using jest-expect-message to include custom messages
+ * with our expect() calls. We pull out these custom messages,
+ * and display them in the student-facing report. This is a 
+ * better experience for them vs. seeing error call stacks.
+ * And it lets us control how big of a "hint" we want to give them.
+ * 
+ * Within tests, you'll make a hint like so:
+ * 
+ *    expect(
+ *      foo,
+ *      'Try making your foo more bar',   // <-- "hint"
+ *    ).toBe("bar");
+ */
+class Reporter {
+  results = []
+
+  onTestCaseResult(test, testResult) {
+    // Keep track of test results, for later
+    this.results.push(testResult);
+  }
+
+
+  onRunComplete(contexts, results) {
+    // Show a special message, if tests fail to load
+    // (eg. `import` failing from a missing dependency)
+    for (let res of results.testResults) {
+      if (res.testExecError) {
+        this.report({
+          execError: res.testExecError.message,
+          results: [],
+          passingCount: 0,
+          failingCount: 0,
+          totalCount: 0,
+        })
+        return;
+      }
+    }
+
+    // Look through test results, and grab any data we want 
+    // to include in our report
+    let resultsSummary = this.results.map(res => ({
+        status: res.status,
+        isPassing: res.status === 'passed',
+        fullName: res.fullName, 
+        isStretch: /STRETCH/.test(res.fullName),
+        // "hints" aka failure messages
+        hints: res.failureMessages
+          .map(msg => this.getHint(msg))
+          .filter(Boolean)
+    }));
+
+    // Prepare a "context" for report templating
+    let passingCount = resultsSummary.filter(i => i.status === 'passed').length;
+    let ctx = {
+      results: resultsSummary,
+      passingCount,
+      failingCount: resultsSummary.length - passingCount,
+      totalCount: resultsSummary.length,
+    };
+    
+    // Generate a report
+    this.report(ctx);
+  }
+
+  /**
+   * Convert test failure messages to "hints"
+   * Assumes we're using jest-expect-message for custom
+   * test failure messages.
+   */
+  getHint(msg) {
+    // jest-expect-message just prepends these custom messages
+    // on top of the regular error stack. So RegEx to the ResCue!
+    let matches = msg.match(/Custom message:\n\s+(.*)\n\n/);
+    return matches && matches[1];
+  }
+
+  /**
+   * Generate a report
+   */
+  report(ctx) {
+    // Assuming our CI environment is Github Actions
+    if (process.env.CI) {
+      // Generate a Github Action annotation message
+      // and log it to stdout
+      let msg = reportGithubActions(ctx);
+      process.stdout.write(msg);
+    }
+    else {
+      // Generate an HTML report
+      // and write it to a file
+      let html = reportHtml(ctx);
+      fs.writeFileSync('testResults.html', html, 'utf8');
+    }
+  }
+}
+
+module.exports = Reporter;
