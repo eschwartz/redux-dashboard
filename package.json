@@ -27,5 +27,11 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.5",
+    "jest-expect-message": "^1.0.2",
+    "wait-for-expect": "^3.0.2"
+  }
 }
