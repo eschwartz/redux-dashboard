@@ -13,7 +13,7 @@ configure({ adapter: new Adapter() });
 // Stub out console.log
 // Some students have very verbose logs, that make it difficult
 // to follow relevant test logs
-console.log = console.warn = console.error = () => {};
+console.log = console.warn = console.error = console.group = () => {};
 
 // Reset mocks between tests
 beforeEach(() => jest.clearAllMocks());
