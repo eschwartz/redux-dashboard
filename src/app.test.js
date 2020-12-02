@@ -31,35 +31,26 @@ it('Components use `connect()` to allow dispatch', async() => {
   ).toBeDefined();
 });
 
-it('Components map Redux State to props to allow props to render ', async() => {
-});
+/**
+Tests:
 
-it('Speed: Reducer Increases and Decreases by 1', async() => {
-});
+ Functional requirements
+- Speed: should start at 0
+- Speed: Increase / Decrease buttons update speed on DOM
+- Speed: Value is held in Redux state
+- Passenger: Default entry with your name
+- Passenger: Adding a passenger shows them in the DOM
+- Passenger: Add a passenger
+- Dashboard: Show current speed
+- Dashboard: Show passenger count
 
-it('Speed: Buttons click dispatches actions to increase and decrease speed reducer value', async() => {
-});
-
-it('Speed: Reducer does all the math', async() => {
-});
-
-it('Speed: Component renders from Redux', async() => {
-});
-
-it('Passenger: View displays list of passenger names', async() => {
-});
-
-it('Passenger: Button click dispatches action with payload of text input field as new string to passenger reducer', async() => {
-});
-
-it('Passenger: Reducer properly uses spread operator', async() => {
-});
-
-it('Dashboard: Displays current speed reducer speed number', async() => {
-});
-
-it('Dashboard: Displays current passenger count', async() => {
-});
+Technical requirements
+- Components use `connect()` to talk to redux
+- Speed and Passengers are held in redux state
+- Speed and Passengers have default values
+- Passenger count is _not_ held in redux state (should do "math" in component)
+- Reducers do not mutate state (ie. use spread operator)
+ */
 
 
 function mountWithStore(Component) {
