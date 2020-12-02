@@ -10,11 +10,11 @@ import logger from 'redux-logger';
 
 
 // be sure to combine your reducers!
-const storeInstance = createStore(
+const storeInstance = () => createStore(
   // reducers,
   applyMiddleware(logger)
 )
 
-ReactDOM.render(<Provider store={storeInstance}><App /></Provider>, document.getElementById('root'));
+ReactDOM.render(<Provider store={storeInstance()}><App /></Provider>, document.getElementById('root'));
 
 export {storeInstance};

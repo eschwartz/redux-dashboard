@@ -5,7 +5,7 @@ import SpeedControl from './components/SpeedControl/SpeedControl';
 import React from 'react';
 import { shallow, mount } from 'enzyme';
 import {default as waitFor} from 'wait-for-expect';
-import {storeInstance as store} from './index'
+import {storeInstance as getStore} from './index'
 import { Provider } from 'react-redux';
 
 // Mock react-dom, so we can import `index.js`
@@ -13,6 +13,10 @@ import { Provider } from 'react-redux';
 // See __mocks__/react-dom.js
 // https://jestjs.io/docs/en/manual-mocks#mocking-node-modules
 jest.mock('react-dom');
+
+// Recreate store between each test
+let store;
+beforeEach(() => store = getStore());
 
 it('Components use `connect()` to allow dispatch', async() => {
   expect(
