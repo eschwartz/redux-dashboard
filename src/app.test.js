@@ -47,19 +47,10 @@ it('Speed: Initial speed shows as `0`', async() => {
 it('Speed: Increase/Decrease buttons should update the speed on the DOM', async() => {
   let speedControl = mountWithStore(SpeedControl);
 
-  // Find the "Increase Speed Button"
-  let increaseButton = findByText(speedControl, 'Increase Speed');
-  expect(
-    increaseButton.length,
-    'Make sure you have a single button that says "Increase Speed"'
-  ).toBe(1);
+  // Find the "Increase/Decrease Speed" Buttons
+  let increaseButton = findIncreaseSpeedButton(speedControl);
+  let decreaseButton = findDecreaseSpeedButton(speedControl);
 
-  // Find the "Decrease Speed Button"
-  let decreaseButton = findByText(speedControl, 'Decrease Speed');
-  expect(
-    decreaseButton.length,
-    'Make sure you have a single button that says "Decrease Speed"'
-  ).toBe(1);
 
   // Click the "Increase Speed" button 4x times
   increaseButton.last().simulate('click');
@@ -81,9 +72,67 @@ it('Speed: Increase/Decrease buttons should update the speed on the DOM', async(
   expect(
     speedControl.text(),
     'Should render correct speed after clicking the "Decrease Speed" button',
-  ).toMatch(/SPEED:\s*2/i)
+  ).toMatch(/SPEED:\s*2/i);
+});
 
+it('Speed: Value of speed is held in redux state', async() => {
+  let speedControl = mountWithStore(SpeedControl);
 
+  // Iterate through the state, and look for a `speed=0` value
+  let reduxSpeedKey = Object.keys(store.getState())
+    // Hopefully they named their redux key something like "speed"
+    // or "currentSpeed" or ....
+    .find(key => /speed/i.test(key))
+  
+
+  // TODO: what if they nest their speed inside an object?
+  // could dive deeper, or could just include a hint to not do that
+  // ...what if they use a weird name for their key? Or mispell speed?
+  // 
+  // For now, we'll leave a hint, pointing them in the right direction.
+
+  // Check that there is a `speed` value in the redux store
+  expect(
+    reduxSpeedKey,
+    `Couldn't find a property in the redux state for the speed. 
+     For best results, name your reducer something like \`speed\`, 
+     \`currentSpeed\` or \`speedReducer\`
+    `
+  ).toBeDefined();
+
+  // Check that redux.speed = 0, on init
+  expect(
+    store.getState()[reduxSpeedKey],
+    `Expecting the initial value of \`reduxState.${reduxSpeedKey}\` to be zero.
+     Make sure your speed reducer is returning a number! (not an object)
+     and that you're defining a default state`
+  ).toBe(0);
+
+  // Find the "Increase/Decrease Speed" Buttons
+  let increaseButton = findIncreaseSpeedButton(speedControl);
+  let decreaseButton = findDecreaseSpeedButton(speedControl);
+
+  // Click the "Increase Speed" button 4x times
+  increaseButton.last().simulate('click');
+  increaseButton.last().simulate('click');
+  increaseButton.last().simulate('click');
+  increaseButton.last().simulate('click');
+
+  // Check that reduxState.speed = 4, after clicking "increase" x 4
+  expect(
+    store.getState()[reduxSpeedKey],
+    `Increase the value of \`reduxState.${reduxSpeedKey}\` by 1, whenever you click "Increase Speed"`
+  ).toBe(4);
+
+  // Click the "Decrease Speed" button 2x times
+  decreaseButton.last().simulate('click');
+  decreaseButton.last().simulate('click');
+
+  // Check that reduxState.speed = 2, after clicking "decrease" x 2
+  expect(
+    store.getState()[reduxSpeedKey],
+    `Decrease the value of \`reduxState.${reduxSpeedKey}\` by 1, whenever you click "Decrease Speed"`
+  ).toBe(2);
 });
 
 /**
@@ -92,7 +141,6 @@ Tests:
  Functional requirements
 - Speed: should start at 0
 - Speed: Increase / Decrease buttons update speed on DOM
-- Speed: Value is held in Redux state
 - Passenger: Default entry with your name
 - Passenger: Adding a passenger shows them in the DOM
 - Passenger: Add a passenger
@@ -131,4 +179,24 @@ function findByText (wrapper, text) {
     node.type() &&
     node.text() === text
   ));
+}
+
+function findIncreaseSpeedButton(wrapper) {
+  let increaseButton = findByText(wrapper, 'Increase Speed');
+  expect(
+    increaseButton.length,
+    'Make sure you have a single button that says "Increase Speed"'
+  ).toBe(1);
+
+  return increaseButton;
+}
+
+function findDecreaseSpeedButton(wrapper) {
+  let decreaseButton = findByText(wrapper, 'Decrease Speed');
+  expect(
+    decreaseButton.length,
+    'Make sure you have a single button that says "Decrease Speed"'
+  ).toBe(1);
+
+  return decreaseButton;
 }
