@@ -7,6 +7,7 @@ import { shallow, mount } from 'enzyme';
 import {default as waitFor} from 'wait-for-expect';
 import {storeInstance as getStore} from './index'
 import { Provider } from 'react-redux';
+import {MemoryRouter} from 'react-router';
 
 // Mock react-dom, so we can import `index.js`
 // without actually rendering the app to the DOM.
@@ -53,10 +54,10 @@ it('Speed: Increase/Decrease buttons should update the speed on the DOM', async(
 
 
   // Click the "Increase Speed" button 4x times
-  increaseButton.last().simulate('click');
-  increaseButton.last().simulate('click');
-  increaseButton.last().simulate('click');
-  increaseButton.last().simulate('click');
+  increaseButton.simulate('click');
+  increaseButton.simulate('click');
+  increaseButton.simulate('click');
+  increaseButton.simulate('click');
 
   // Should render "SPEED: 4"
   expect(
@@ -65,8 +66,8 @@ it('Speed: Increase/Decrease buttons should update the speed on the DOM', async(
   ).toMatch(/SPEED:\s*4/i)
 
   // Click the "Decrease Speed" button 4x times
-  decreaseButton.last().simulate('click');
-  decreaseButton.last().simulate('click');
+  decreaseButton.simulate('click');
+  decreaseButton.simulate('click');
 
   // Should render "SPEED: 2"
   expect(
@@ -113,10 +114,10 @@ it('Speed: Value of speed is held in redux state', async() => {
   let decreaseButton = findDecreaseSpeedButton(speedControl);
 
   // Click the "Increase Speed" button 4x times
-  increaseButton.last().simulate('click');
-  increaseButton.last().simulate('click');
-  increaseButton.last().simulate('click');
-  increaseButton.last().simulate('click');
+  increaseButton.simulate('click');
+  increaseButton.simulate('click');
+  increaseButton.simulate('click');
+  increaseButton.simulate('click');
 
   // Check that reduxState.speed = 4, after clicking "increase" x 4
   expect(
@@ -125,8 +126,8 @@ it('Speed: Value of speed is held in redux state', async() => {
   ).toBe(4);
 
   // Click the "Decrease Speed" button 2x times
-  decreaseButton.last().simulate('click');
-  decreaseButton.last().simulate('click');
+  decreaseButton.simulate('click');
+  decreaseButton.simulate('click');
 
   // Check that reduxState.speed = 2, after clicking "decrease" x 2
   expect(
@@ -149,34 +150,131 @@ it('Passengers: Default entry with your name', async() => {
   ).toBe(true);
 });
 
+it('Passengers: Adding a passenger shows them in the DOM', async() => {
+  let passengers = mountWithStore(Passengers);
+
+  // Enter a name into the input
+  simulateChange(passengers.find('input'), 'Dev Jana');
+
+  // Click the "Add Passenger" button
+  passengers.find('button').simulate('click');
+
+  // Check that passenger was added in an <li />
+  let lastItem = passengers.update().find('li').last();
+  expect(
+    lastItem.text().trim(),
+    'New passenger should be added inside a `<li>`'
+  ).toBe('Dev Jana');
+});
+
+it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list', async() => {
+  let passengers = mountWithStore(Passengers);
+
+  // Enter a name into the input
+  simulateChange(passengers.find('input'), 'Dev Jana');
+
+  // Click the "Add Passenger" button
+  passengers.find('button')
+    .simulate('click');
+
+  passengers.update();
+  expect(
+    passengers.find('input').instance().value,
+    'Empty the <input /> value, on button click.'
+  ).toBe('');
+
+});
+
+it('Passengers: Passenger list is kept in redux state', async() => {
+  let passengers = mountWithStore(Passengers);
+
+  // Iterate through the redux state,
+  // and look for a key called "passengers*"
+  let reduxKey = Object.keys(store.getState())
+    // Hopefully they named their redux key something like "speed"
+    // or "currentSpeed" or ....
+    .find(key => /passenger/i.test(key));
+
+  // Check that theres a "passenger*" key in the redux state
+  expect(
+    reduxKey,
+    `Couldn't find a property in the redux state for the speed. 
+     For best results, name your reducer something like \`passengers\`, 
+     \`passengerList\` or \`passengerReducer\``
+  ).toBeDefined();
+
+  // Check that redux.passengers is an array, on init
+  expect(
+    Array.isArray(store.getState()[reduxKey]),
+    `\`reduxState.${reduxKey}\` should return an array
+     as a default value`
+  ).toBe(true);
+
+  // Remember how many passengers we started with,
+  let initPassengerCount = store.getState()[reduxKey].length;
+
+  // Add a passenger, via the form
+  simulateChange(passengers.find('input'), 'Dev Jana');
+  passengers.find('button').simulate('click');
+
+  // Check that an item is added to the 
+  // redux.passengers array
+  expect(
+    store.getState()[reduxKey].length,
+    'Should add a passenger to redux state'
+  ).toBe(initPassengerCount + 1);
+});
+
+it('Dashboard: show current speed', async() => {
+  let app = mountWithStore(App);
+
+  // Click the  "Increase speed" x 2
+  let increaseButton = findIncreaseSpeedButton(app);
+  increaseButton.simulate('click');
+  increaseButton.simulate('click');
+
+  // Navigate to Dashboard
+  clickLink(app, 'Dashboard');
+
+  let dashboard = app.update().find('Dashboard');
+  expect(
+    dashboard.text(),
+    'Dashboard should render "SPEED: 2" when you click "Increase Speed" twice'
+  ).toMatch(/SPEED:\s+2/i);
+});
+
+
+
 /**
 Tests:
 
  Functional requirements
 x Speed: should start at 0
 x Speed: Increase / Decrease buttons update speed on DOM
-- Passenger: Default entry with your name
-- Passenger: Adding a passenger shows them in the DOM
-- Passenger: Add a passenger
+x Passenger: Default entry with your name
+x Passenger: Adding a passenger shows them in the DOM
+x Passenger: Add a passenger
 - Dashboard: Show current speed
 - Dashboard: Show passenger count
 
 Technical requirements
 x Components use `connect()` to talk to redux
 x Speed held in redux state
-- Passenger held in redux state
+x Passenger held in redux state
 x Speed has default values in redux
-- Passnger has default values in redux
-- Passenger count is _not_ held in redux state (should do "math" in component)
+x Passenger has default values in redux
+? Passenger count is _not_ held in redux state (should do "math" in component)
 - Reducers do not mutate state (ie. use spread operator)
  */
 
 
 function mountWithStore(Component) {
   let provider = mount(
-    <Provider store={store}>
-      {React.createElement(Component)}
-    </Provider>
+    <MemoryRouter>
+      <Provider store={store}>
+        {React.createElement(Component)}
+      </Provider>
+    </MemoryRouter>
   );
 
   // If the component is wrapped in a Redux <Connect />,
@@ -204,7 +302,7 @@ function findIncreaseSpeedButton(wrapper) {
     'Make sure you have a single button that says "Increase Speed"'
   ).toBe(1);
 
-  return increaseButton;
+  return increaseButton.last();
 }
 
 function findDecreaseSpeedButton(wrapper) {
@@ -214,5 +312,33 @@ function findDecreaseSpeedButton(wrapper) {
     'Make sure you have a single button that says "Decrease Speed"'
   ).toBe(1);
 
-  return decreaseButton;
+  return decreaseButton.last();
+}
+
+function simulateChange(input, value) {
+  // Simulate the change event
+  input.simulate('change', { 
+    target: { value } 
+  });
+
+  // Update the value of the `input` element
+  input.instance().value = value;
+
+  return input;
+}
+
+function clickLink(wrapper, linkText) {
+  let link = wrapper.findWhere(node => (
+      node.type() &&
+      node.name() === 'a' &&
+      node.text() === linkText
+    ));
+
+  expect(
+    link.length,
+    `Failed to find a link with text "${linkText}" inside ${wrapper.name()}`
+  ).toBe(1);
+
+  // https://github.com/enzymejs/enzyme/issues/516
+  link.simulate('click', { button: 0 });
 }
