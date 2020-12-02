@@ -188,30 +188,10 @@ it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list',
 it('Passengers: Passenger list is kept in redux state', async() => {
   let passengers = mountWithStore(Passengers);
 
-  // Iterate through the redux state,
-  // and look for a key called "passengers*"
-  let reduxKey = Object.keys(store.getState())
-    // Hopefully they named their redux key something like "speed"
-    // or "currentSpeed" or ....
-    .find(key => /passenger/i.test(key));
-
-  // Check that theres a "passenger*" key in the redux state
-  expect(
-    reduxKey,
-    `Couldn't find a property in the redux state for the speed. 
-     For best results, name your reducer something like \`passengers\`, 
-     \`passengerList\` or \`passengerReducer\``
-  ).toBeDefined();
-
-  // Check that redux.passengers is an array, on init
-  expect(
-    Array.isArray(store.getState()[reduxKey]),
-    `\`reduxState.${reduxKey}\` should return an array
-     as a default value`
-  ).toBe(true);
+  // Find the passengers state in redux
 
   // Remember how many passengers we started with,
-  let initPassengerCount = store.getState()[reduxKey].length;
+  let initPassengerCount = getPassengersState(store).length;
 
   // Add a passenger, via the form
   simulateChange(passengers.find('input'), 'Dev Jana');
@@ -220,7 +200,7 @@ it('Passengers: Passenger list is kept in redux state', async() => {
   // Check that an item is added to the 
   // redux.passengers array
   expect(
-    store.getState()[reduxKey].length,
+    getPassengersState(store).length,
     'Should add a passenger to redux state'
   ).toBe(initPassengerCount + 1);
 });
@@ -279,28 +259,32 @@ it('Dashboard: show passenger count', async() => {
   ).toMatch(/PASSENGER COUNT:\s+3/i);
 });
 
+it('Reducers should not mutate state', async() => {
+  let passengers = mountWithStore(Passengers);
 
-/**
-Tests:
+  // Grab the passengers list from the redux state
+  let prevPassengersState = getPassengersState(store);
 
- Functional requirements
-x Speed: should start at 0
-x Speed: Increase / Decrease buttons update speed on DOM
-x Passenger: Default entry with your name
-x Passenger: Adding a passenger shows them in the DOM
-x Passenger: Add a passenger
-x Dashboard: Show current speed
-- Dashboard: Show passenger count
+  // Add a couple of passengers
+  simulateChange(passengers.find('input'), 'Dev Jana');
+  passengers.find('button').simulate('click');
+  simulateChange(passengers.find('input'), 'Edan Schwartz');
+  passengers.find('button').simulate('click');
 
-Technical requirements
-x Components use `connect()` to talk to redux
-x Speed held in redux state
-x Passenger held in redux state
-x Speed has default values in redux
-x Passenger has default values in redux
-? Passenger count is _not_ held in redux state (should do "math" in component)
-- Reducers do not mutate state (ie. use spread operator)
- */
+  // Grab the updated store.passengers value
+  let nextPassengersState = getPassengersState(store);
+
+  // Our new passenger state should be a different
+  // object that our previous one
+  // (this will fail if students use `[].push()`, for eg)
+  expect(
+    nextPassengersState,
+    `Each call to the passengers reducer should return a brand new array.
+     Trying using the spread operator (\`...\`), instead of \`[].push()\`
+    `
+  ).not.toBe(prevPassengersState);
+});
+
 
 
 function mountWithStore(Component) {
@@ -376,4 +360,30 @@ function clickLink(wrapper, linkText) {
 
   // https://github.com/enzymejs/enzyme/issues/516
   link.simulate('click', { button: 0 });
+}
+
+function getPassengersState(store) {
+  // Iterate through the redux state,
+  // and look for a key called "passengers*"
+  let reduxKey = Object.keys(store.getState())
+    // Hopefully they named their redux key something like "speed"
+    // or "currentSpeed" or ....
+    .find(key => /passenger/i.test(key));
+
+  // Check that theres a "passenger*" key in the redux state
+  expect(
+    reduxKey,
+    `Couldn't find a property in the redux state for the speed. 
+     For best results, name your reducer something like \`passengers\`, 
+     \`passengerList\` or \`passengerReducer\``
+  ).toBeDefined();
+
+  // Check that redux.passengers is an array, on init
+  expect(
+    Array.isArray(store.getState()[reduxKey]),
+    `\`reduxState.${reduxKey}\` should return an array
+     as a default value`
+  ).toBe(true);
+
+  return store.getState()[reduxKey];
 }
