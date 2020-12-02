@@ -135,12 +135,26 @@ it('Speed: Value of speed is held in redux state', async() => {
   ).toBe(2);
 });
 
+it('Passengers: Default entry with your name', async() => {
+  let passengers = mountWithStore(Passengers);
+
+  expect(
+    passengers.find('li').length,
+    'Expecting a single `<li>` element with your name in the `<Passengers />` component'
+  ).toBe(1);
+
+  expect(
+    /\w+/.test(passengers.find('li').text()),
+    'The `<li>` in `<Passengers />` should render your name (it appears to be empty!)'
+  ).toBe(true);
+});
+
 /**
 Tests:
 
  Functional requirements
-- Speed: should start at 0
-- Speed: Increase / Decrease buttons update speed on DOM
+x Speed: should start at 0
+x Speed: Increase / Decrease buttons update speed on DOM
 - Passenger: Default entry with your name
 - Passenger: Adding a passenger shows them in the DOM
 - Passenger: Add a passenger
@@ -148,9 +162,11 @@ Tests:
 - Dashboard: Show passenger count
 
 Technical requirements
-- Components use `connect()` to talk to redux
-- Speed and Passengers are held in redux state
-- Speed and Passengers have default values
+x Components use `connect()` to talk to redux
+x Speed held in redux state
+- Passenger held in redux state
+x Speed has default values in redux
+- Passnger has default values in redux
 - Passenger count is _not_ held in redux state (should do "math" in component)
 - Reducers do not mutate state (ie. use spread operator)
  */
