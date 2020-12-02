@@ -236,6 +236,7 @@ it('Dashboard: show current speed', async() => {
   // Navigate to Dashboard
   clickLink(app, 'Dashboard');
 
+  // Dashboard should show the updated speed
   let dashboard = app.update().find('Dashboard');
   expect(
     dashboard.text(),
@@ -243,6 +244,40 @@ it('Dashboard: show current speed', async() => {
   ).toMatch(/SPEED:\s+2/i);
 });
 
+it('Dashboard: show passenger count', async() => {
+  let app = mountWithStore(App);
+
+  // Navigate to the Passengers view
+  clickLink(app, 'Passengers');
+
+  // Add a couple passengers
+  let passengers = app.update().find('Passengers');
+  
+  simulateChange(passengers.find('input'), 'Dev Jana');
+  passengers.find('button').simulate('click');
+
+  simulateChange(passengers.find('input'), 'Edan Schwartz');
+  passengers.find('button').simulate('click');
+
+  // Count how many passengers we have now.
+  // Could be 2 or 3, depending on whether they
+  // remembered to include themselves as a default passenger
+  let passengerCount = passengers.update().find('li').length;
+  expect(
+    passengerCount,
+    `Adding a passenger should render some \`<li>\`s to the \`<Passengers />\` component`
+  ).toBeGreaterThanOrEqual(2);
+
+  // Navigate to the dashboard
+  clickLink(app, 'Dashboard');
+
+  // Dashboard should show the updated speed
+  let dashboard = app.update().find('Dashboard');
+  expect(
+    dashboard.text(),
+    'Dashboard should render "SPEED: 2" when you click "Increase Speed" twice'
+  ).toMatch(/PASSENGER COUNT:\s+3/i);
+});
 
 
 /**
@@ -254,7 +289,7 @@ x Speed: Increase / Decrease buttons update speed on DOM
 x Passenger: Default entry with your name
 x Passenger: Adding a passenger shows them in the DOM
 x Passenger: Add a passenger
-- Dashboard: Show current speed
+x Dashboard: Show current speed
 - Dashboard: Show passenger count
 
 Technical requirements
