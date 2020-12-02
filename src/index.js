@@ -16,3 +16,5 @@ const storeInstance = createStore(
 )
 
 ReactDOM.render(<Provider store={storeInstance}><App /></Provider>, document.getElementById('root'));
+
+export {storeInstance};
