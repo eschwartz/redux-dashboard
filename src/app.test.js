@@ -177,9 +177,8 @@ it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list',
   passengers.find('button')
     .simulate('click');
 
-  passengers.update();
   expect(
-    passengers.find('input').instance().value,
+    passengers.update().find('input').instance().value,
     'Empty the <input /> value, on button click.'
   ).toBe('');
 
@@ -242,7 +241,7 @@ it('Dashboard: show passenger count', async() => {
   // Count how many passengers we have now.
   // Could be 2 or 3, depending on whether they
   // remembered to include themselves as a default passenger
-  let passengerCount = passengers.update().find('li').length;
+  let passengerCount = app.update().find('Passengers').find('li').length;
   expect(
     passengerCount,
     `Adding a passenger should render some \`<li>\`s to the \`<Passengers />\` component`
@@ -255,8 +254,8 @@ it('Dashboard: show passenger count', async() => {
   let dashboard = app.update().find('Dashboard');
   expect(
     dashboard.text(),
-    'Dashboard should render "SPEED: 2" when you click "Increase Speed" twice'
-  ).toMatch(/PASSENGER COUNT:\s+3/i);
+    'Dashboard should render the updated "PASSENGER COUNT" when you add a passenger'
+  ).toMatch(new RegExp(`PASSENGER COUNT:\\s*${passengerCount}`, 'i'));
 });
 
 it('Reducers should not mutate state', async() => {
