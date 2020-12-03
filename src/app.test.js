@@ -42,7 +42,7 @@ it('Speed: Initial speed shows as `0`', async() => {
   expect(
     speedControl.text(),
     'Speed Control component should render "SPEED: 0" on initial load',
-  ).toMatch(/SPEED:\s*0/i)
+  ).toMatch(/0/)
 });
 
 it('Speed: Increase/Decrease buttons should update the speed on the DOM', async() => {
@@ -63,7 +63,7 @@ it('Speed: Increase/Decrease buttons should update the speed on the DOM', async(
   expect(
     speedControl.text(),
     'Should render "SPEED: 4" after clicking "Increase Speed" 4x times',
-  ).toMatch(/SPEED:\s*4/i)
+  ).toMatch(/4/i)
 
   // Click the "Decrease Speed" button 4x times
   decreaseButton.simulate('click');
@@ -73,7 +73,7 @@ it('Speed: Increase/Decrease buttons should update the speed on the DOM', async(
   expect(
     speedControl.text(),
     'Should render correct speed after clicking the "Decrease Speed" button',
-  ).toMatch(/SPEED:\s*2/i);
+  ).toMatch(/2/i);
 });
 
 it('Speed: Value of speed is held in redux state', async() => {
@@ -307,14 +307,15 @@ function mountWithStore(Component) {
 
 // Helper function, to find an Enzyme element by text
 function findByText (wrapper, text) {
+  let re = text instanceof RegExp ? text : new RegExp(text)
   return wrapper.findWhere(node => (
     node.type() &&
-    node.text() === text
-  ));
+    re.test(node.text())
+  )).last();
 }
 
 function findIncreaseSpeedButton(wrapper) {
-  let increaseButton = findByText(wrapper, 'Increase Speed');
+  let increaseButton = findByText(wrapper, /^Increase Speed$/i);
   expect(
     increaseButton.length,
     'Make sure you have a single button that says "Increase Speed"'
@@ -324,7 +325,7 @@ function findIncreaseSpeedButton(wrapper) {
 }
 
 function findDecreaseSpeedButton(wrapper) {
-  let decreaseButton = findByText(wrapper, 'Decrease Speed');
+  let decreaseButton = findByText(wrapper, /^Decrease Speed$/i);
   expect(
     decreaseButton.length,
     'Make sure you have a single button that says "Decrease Speed"'
