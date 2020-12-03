@@ -60,6 +60,7 @@ class Reporter {
         isPassing: res.status === 'passed',
         fullName: res.fullName, 
         isStretch: /STRETCH/.test(res.fullName),
+        isGeneral: /GENERAL/.test(res.fullName),
         // "hints" aka failure messages
         hints: res.failureMessages
           .map(msg => this.getHint(msg))

@@ -3,10 +3,10 @@ module.exports = (ctx) => {
     if (result.status === 'passed') {
       return 'success';
     }
-    if (result.status === 'failed' && !result.isStretch) {
-      return 'danger';
+    else if (result.isStretch || result.isGeneral) {
+      return 'secondary'
     }
-    return 'secondary';
+    return 'danger';
   } 
 
   return `
@@ -88,7 +88,7 @@ module.exports = (ctx) => {
             
             ${res.status === 'failed' && res.hints.length ?
              `
-              <div id="collapse-${i}" class="collapse ${res.isStretch ? '' : 'show'}">
+              <div id="collapse-${i}" class="collapse ${res.isStretch || res.isGeneral ? '' : 'show'}">
                 <div class="hintsTitle">Hint:</div>
                 ${res.hints.map(hint => `
                   <div class="card-body">
