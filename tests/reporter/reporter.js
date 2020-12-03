@@ -22,13 +22,6 @@ const reportGithubActions = require('./report-github-actions');
  *    ).toBe("bar");
  */
 class Reporter {
-  results = []
-
-  onTestCaseResult(test, testResult) {
-    // Keep track of test results, for later
-    this.results.push(testResult);
-  }
-
 
   onRunComplete(contexts, results) {
     // Show a special message, if tests fail to load
@@ -45,10 +38,24 @@ class Reporter {
         return;
       }
     }
+    
+    // Grab child-est test results (ignore files, describes, etc);
+    let testResults = (function getTestResults(results) {
+      let testResults = [];
+      results.forEach(res => {
+        if (res.testResults) {
+          testResults.push(...getTestResults(res.testResults));
+        }
+        else {
+          testResults.push(res);
+        }
+      });
+      return testResults;
+    })(results.testResults);
 
     // Look through test results, and grab any data we want 
     // to include in our report
-    let resultsSummary = this.results.map(res => ({
+    let resultsSummary = testResults.map(res => ({
         status: res.status,
         isPassing: res.status === 'passed',
         fullName: res.fullName, 
