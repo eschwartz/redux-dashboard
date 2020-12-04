@@ -32,6 +32,7 @@
   "devDependencies": {
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
+    "html-validator": "^5.1.17",
     "jest-expect-message": "^1.0.2",
     "wait-for-expect": "^3.0.2"
   }
