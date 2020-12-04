@@ -9,6 +9,7 @@ import {storeInstance as getStore} from './index'
 import { Provider } from 'react-redux';
 import {MemoryRouter} from 'react-router';
 import validateHTML from 'html-validator';
+import {execSync} from 'child_process';
 
 // Mock react-dom, so we can import `index.js`
 // without actually rendering the app to the DOM.
@@ -174,23 +175,6 @@ it('Passengers: Adding a passenger shows them in the DOM', async() => {
   ).toBe('Dev Jana');
 });
 
-it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list', async() => {
-  let passengers = mountWithStore(Passengers);
-
-  // Enter a name into the input
-  simulateChange(passengers.find('input'), 'Dev Jana');
-
-  // Click the "Add Passenger" button
-  passengers.find('button')
-    .simulate('click');
-
-  expect(
-    passengers.update().find('input').instance().value,
-    'Empty the <input /> value, on button click.'
-  ).toBe('');
-
-});
-
 it('Passengers: Passenger list is kept in redux state', async() => {
   let passengers = mountWithStore(Passengers);
 
@@ -295,6 +279,23 @@ it('Reducers should not mutate state', async() => {
   ).not.toBe(prevPassengersState);
 });
 
+it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list', async() => {
+  let passengers = mountWithStore(Passengers);
+
+  // Enter a name into the input
+  simulateChange(passengers.find('input'), 'Dev Jana');
+
+  // Click the "Add Passenger" button
+  passengers.find('button')
+    .simulate('click');
+
+  expect(
+    passengers.update().find('input').instance().value,
+    'Empty the <input /> value, on button click.'
+  ).toBe('');
+
+});
+
 it('[GENERAL] HTML is valid', async() => {
   let app = mountWithStore(App);
 
@@ -327,6 +328,19 @@ it('[GENERAL] HTML is valid', async() => {
 
   // Validate Dashboard HTML
   await expectValidHTML(app, 'Dashboard');
+});
+
+it('[GENERAL] At least 2 commits', async() => {
+  // Count the number of commits in the last 24 hours. 
+  // This may not work 100%, eg. if Prime staff have updated the assignment recently.
+  let commitCount = execSync('git log --oneline --since="1 day ago" | wc -l', {
+    encoding: 'utf8'
+  }).trim();
+
+  expect(
+    Number(commitCount),
+    `Commit early and often!`
+  ).toBeGreaterThanOrEqual(2);
 });
 
 async function expectValidHTML(wrapper, name='App') {
