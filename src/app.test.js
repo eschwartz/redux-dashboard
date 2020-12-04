@@ -164,7 +164,7 @@ it('Passengers: Adding a passenger shows them in the DOM', async() => {
   passengers.find('button').simulate('click');
 
   // Check that passenger was added inside the <ul />
-  let lastItem = passengers.update().find('ul').children('*').last();
+  let lastItem = findPassengerList(passengers.update()).last();
   expect(
     lastItem.length,
     'Couldn\'t find an `<li>` element for the new passenger'
@@ -232,11 +232,7 @@ it('Dashboard: show passenger count', async() => {
   // Count how many passengers we have now.
   // Could be 2 or 3, depending on whether they
   // remembered to include themselves as a default passenger
-  let passengerCount = app.update()
-    .find('Passengers')
-    .find('ul')
-    .children('*')
-    .length;
+  let passengerCount = findPassengerList(app.update().find('Passengers')).length;
   expect(
     passengerCount,
     `Adding a passenger should render some \`<li>\`s to the \`<Passengers />\` component`
@@ -470,4 +466,19 @@ function getPassengersState(store) {
   ).toBe(true);
 
   return store.getState()[reduxKey];
+}
+
+function findPassengerList(wrapper) {
+  // Look in a few different places for passengers.
+  // We're being forgiving here, for bad HTML
+  // (note that we test HTML separately as a GENERAL item)
+
+  // Try finding any element inside the <ul>
+  let passengers = wrapper.find('ul').children('*');
+  if (passengers.length) {
+    return passengers;
+  }
+
+  // Try finding <li> items elsewhere on the page
+  return wrapper.find('li');
 }
