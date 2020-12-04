@@ -60,12 +60,12 @@ module.exports = (ctx) => {
         <div class="alert alert-danger">
           <h4 class="alert-heading">Tests failed to run!</h4>
           <p>
-            This is often because of a faulty <code>import</code> statement,
-            or because of a dependency missing from your <code>package.json</code>
+            This means there's probably an error in your app. 
+            Carefully read the <em>Error Details</em> below, and see if you can work it out!
           </p>
           <hr>
           <p class="mb-0">
-            <em>Error details:</em>
+            <em>Error Details:</em>
           </p>
           <pre>${ctx.execError}</pre>
         </div>
