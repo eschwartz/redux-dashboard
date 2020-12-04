@@ -139,13 +139,15 @@ it('Speed: Value of speed is held in redux state', async() => {
 it('Passengers: Default entry with your name', async() => {
   let passengers = mountWithStore(Passengers);
 
+  let passengerItems = passengers.find('ul').children('*');
+
   expect(
-    passengers.find('li').length,
+    passengerItems.length,
     'Expecting a single `<li>` element with your name in the `<Passengers />` component'
   ).toBe(1);
 
   expect(
-    /\w+/.test(passengers.find('li').text()),
+    /\w+/.test(passengerItems.text()),
     'The `<li>` in `<Passengers />` should render your name (it appears to be empty!)'
   ).toBe(true);
 });
@@ -159,8 +161,12 @@ it('Passengers: Adding a passenger shows them in the DOM', async() => {
   // Click the "Add Passenger" button
   passengers.find('button').simulate('click');
 
-  // Check that passenger was added in an <li />
-  let lastItem = passengers.update().find('li').last();
+  // Check that passenger was added inside the <ul />
+  let lastItem = passengers.update().find('ul').children('*').last();
+  expect(
+    lastItem.length,
+    'Couldn\'t find an `<li>` element for the new passenger'
+  ).toBe(1);
   expect(
     lastItem.text().trim(),
     'New passenger should be added inside a `<li>`'
@@ -241,7 +247,11 @@ it('Dashboard: show passenger count', async() => {
   // Count how many passengers we have now.
   // Could be 2 or 3, depending on whether they
   // remembered to include themselves as a default passenger
-  let passengerCount = app.update().find('Passengers').find('li').length;
+  let passengerCount = app.update()
+    .find('Passengers')
+    .find('ul')
+    .children('*')
+    .length;
   expect(
     passengerCount,
     `Adding a passenger should render some \`<li>\`s to the \`<Passengers />\` component`
