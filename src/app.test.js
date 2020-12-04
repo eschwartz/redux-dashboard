@@ -460,7 +460,7 @@ function getPassengersState(store) {
   let reduxKey = Object.keys(store.getState())
     // Hopefully they named their redux key something like "speed"
     // or "currentSpeed" or ....
-    .find(key => /passenger/i.test(key));
+    .find(key => /(passenger|person|people)/i.test(key));
 
   // Check that theres a "passenger*" key in the redux state
   expect(
