@@ -86,13 +86,25 @@ it('Speed: Value of speed is held in redux state', async() => {
     // Hopefully they named their redux key something like "speed"
     // or "currentSpeed" or ....
     .find(key => /speed/i.test(key))
-  
 
-  // TODO: what if they nest their speed inside an object?
-  // could dive deeper, or could just include a hint to not do that
-  // ...what if they use a weird name for their key? Or mispell speed?
-  // 
-  // For now, we'll leave a hint, pointing them in the right direction.
+  // Students might keep the `speed` as a number, as an object, or as an array
+  // Sniff the speed data type, and try to pull out the actual numeric value
+  // This won't catch *all* the weird ways students may represent their speed,
+  // but should catch the bulk of them.
+  let getReduxSpeed;
+  let currentReduxVal = store.getState()[reduxSpeedKey];
+  // If it's an object, grab the first value from the object
+  if (typeof currentReduxVal === 'object' && !!currentReduxVal) {
+    getReduxSpeed = () => Object.values(store.getState()[reduxSpeedKey])[0];
+  }
+  // If it's an array, grab the first item
+  else if (Array.isArray(currentReduxValue)) {
+    getReduxSpeed = () => store.getState()[reduxSpeedKey][0];
+  }
+  // Otherwise, assume it's a number
+  else {
+    getReduxSpeed = () => store.getState()[reduxSpeedKey];
+  }
 
   // Check that there is a `speed` value in the redux store
   expect(
@@ -105,7 +117,7 @@ it('Speed: Value of speed is held in redux state', async() => {
 
   // Check that redux.speed = 0, on init
   expect(
-    store.getState()[reduxSpeedKey],
+    getReduxSpeed(),
     `Expecting the initial value of \`reduxState.${reduxSpeedKey}\` to be zero.
      Make sure your speed reducer is returning a number! (not an object)
      and that you're defining a default state`
@@ -123,7 +135,7 @@ it('Speed: Value of speed is held in redux state', async() => {
 
   // Check that reduxState.speed = 4, after clicking "increase" x 4
   expect(
-    store.getState()[reduxSpeedKey],
+    getReduxSpeed(),
     `Increase the value of \`reduxState.${reduxSpeedKey}\` by 1, whenever you click "Increase Speed"`
   ).toBe(4);
 
@@ -133,7 +145,7 @@ it('Speed: Value of speed is held in redux state', async() => {
 
   // Check that reduxState.speed = 2, after clicking "decrease" x 2
   expect(
-    store.getState()[reduxSpeedKey],
+    getReduxSpeed(),
     `Decrease the value of \`reduxState.${reduxSpeedKey}\` by 1, whenever you click "Decrease Speed"`
   ).toBe(2);
 });
