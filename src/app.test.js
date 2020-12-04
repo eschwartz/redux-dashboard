@@ -110,7 +110,7 @@ it('Speed: Value of speed is held in redux state', async() => {
   expect(
     reduxSpeedKey,
     `Couldn't find a property in the redux state for the speed. 
-     For best results, name your reducer something like \`speed\`, 
+     Try naming your reducer something like \`speed\`, 
      \`currentSpeed\` or \`speedReducer\`
     `
   ).toBeDefined();
@@ -465,8 +465,8 @@ function getPassengersState(store) {
   // Check that theres a "passenger*" key in the redux state
   expect(
     reduxKey,
-    `Couldn't find a property in the redux state for the speed. 
-     For best results, name your reducer something like \`passengers\`, 
+    `Couldn't find a property in the redux state to track passengers. 
+     Try naming your reducer something like \`passengers\`, 
      \`passengerList\` or \`passengerReducer\``
   ).toBeDefined();
 
