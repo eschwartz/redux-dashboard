@@ -470,14 +470,21 @@ function getPassengersState(store) {
      \`passengerList\` or \`passengerReducer\``
   ).toBeDefined();
 
+  let passengerList = store.getState()[reduxKey];
+  // The passenger list might be wrapped in an object
+  // like { passengers: ['A', 'B', 'C'] }
+  if (passengerList && typeof passengerList === 'object') {
+    passengerList = Object.values(passengerList)[0];
+  }
+
   // Check that redux.passengers is an array, on init
   expect(
-    Array.isArray(store.getState()[reduxKey]),
+    Array.isArray(passengerList),
     `\`reduxState.${reduxKey}\` should return an array
      as a default value`
   ).toBe(true);
 
-  return store.getState()[reduxKey];
+  return passengerList;
 }
 
 function findPassengerList(wrapper) {
