@@ -11,6 +11,7 @@ react-scripts test \
   --env=jsdom \
   ${testNamePatternFlag} \
   --reporters=./tests/reporter/reporter.js \
+  --no-color \
   --watchAll=false
 
 # If we're running from Github Actions, show a "All tested passed!"

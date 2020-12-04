@@ -8,6 +8,7 @@ import {default as waitFor} from 'wait-for-expect';
 import {storeInstance as getStore} from './index'
 import { Provider } from 'react-redux';
 import {MemoryRouter} from 'react-router';
+import validateHTML from 'html-validator';
 
 // Mock react-dom, so we can import `index.js`
 // without actually rendering the app to the DOM.
@@ -294,6 +295,65 @@ it('Reducers should not mutate state', async() => {
   ).not.toBe(prevPassengersState);
 });
 
+it('[GENERAL] HTML is valid', async() => {
+  let app = mountWithStore(App);
+
+  // Validate landing page (Speed Control)
+  await expectValidHTML(app, 'Speed Control View');
+
+  // Navigate to Passengers view
+  clickLink(app, 'Passengers');
+
+  // Add a couple passengers
+  let passengers = app.update().find('Passengers');
+  try {
+    simulateChange(passengers.find('input'), 'Dev Jana');
+    passengers.find('button').simulate('click');
+  
+    simulateChange(passengers.find('input'), 'Edan Schwartz');
+    passengers.find('button').simulate('click');
+  }
+  catch (err) {
+    // Don't let the failure of adding passengers
+    // make HTML validation fail
+    // (it's tested elsewhere)
+  }
+
+  // Validate Passengers HTML
+  await expectValidHTML(app, 'Passengers view')
+
+  // Navigate to Dashboard
+  clickLink(app, 'Dashboard');
+
+  // Validate Dashboard HTML
+  await expectValidHTML(app, 'Dashboard');
+});
+
+async function expectValidHTML(wrapper, name='App') {
+  // https://github.com/zrrrzzt/html-validator
+  let res;
+  try {
+    res = await validateHTML({
+      validator: 'WHATWG',
+      data: wrapper.update().html(),
+      isFragment: true
+    });
+  }
+  catch (err) {
+    expect(
+      err,
+      `HTML Validation of ${wrapper.name()} failed: ${err.message}`
+    ).toBeUndefined()
+  }
+
+  // Remove duplicate errors 
+  let uniqueErrors = [...new Set(res.errors.map(e => e.message))]
+  expect(
+    res.isValid,
+    `${name} has invalid HTML: 
+     ${uniqueErrors.join(';\n')}`
+  ).toBe(true);
+}
 
 
 function mountWithStore(Component) {

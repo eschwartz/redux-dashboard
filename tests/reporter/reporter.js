@@ -88,7 +88,7 @@ class Reporter {
   getHint(msg) {
     // jest-expect-message just prepends these custom messages
     // on top of the regular error stack. So RegEx to the ResCue!
-    let matches = msg.match(/Custom message:\n\s+(.*)\n\n/);
+    let matches = msg.match(/Custom message:\n\s+(.*)\n\nexpect\(/s);
     return matches && matches[1];
   }
 
