@@ -98,7 +98,7 @@ it('Speed: Value of speed is held in redux state', async() => {
     getReduxSpeed = () => Object.values(store.getState()[reduxSpeedKey])[0];
   }
   // If it's an array, grab the first item
-  else if (Array.isArray(currentReduxValue)) {
+  else if (Array.isArray(currentReduxVal)) {
     getReduxSpeed = () => store.getState()[reduxSpeedKey][0];
   }
   // Otherwise, assume it's a number
