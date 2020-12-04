@@ -352,7 +352,7 @@ async function expectValidHTML(wrapper, name='App') {
   catch (err) {
     expect(
       err,
-      `HTML Validation of ${wrapper.name()} failed: ${err.message}`
+      `HTML Validation of ${name} failed.`
     ).toBeUndefined()
   }
 
