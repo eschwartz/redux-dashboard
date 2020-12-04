@@ -43,6 +43,7 @@ module.exports = (ctx) => {
       background: rgb(140 140 140 / 30%);
       padding: 2px 5px;
       color: inherit;
+      white-space: pre-wrap;
     }
     li.has-hints {
       cursor: pointer;
