@@ -93,13 +93,13 @@ it('Speed: Value of speed is held in redux state', async() => {
   // but should catch the bulk of them.
   let getReduxSpeed;
   let currentReduxVal = store.getState()[reduxSpeedKey];
-  // If it's an object, grab the first value from the object
-  if (typeof currentReduxVal === 'object' && !!currentReduxVal) {
-    getReduxSpeed = () => Object.values(store.getState()[reduxSpeedKey])[0];
-  }
   // If it's an array, grab the first item
-  else if (Array.isArray(currentReduxVal)) {
+  if (Array.isArray(currentReduxVal)) {
     getReduxSpeed = () => store.getState()[reduxSpeedKey][0];
+  }
+  // If it's an object, grab the first value from the object
+  else if (typeof currentReduxVal === 'object' && !!currentReduxVal) {
+    getReduxSpeed = () => Object.values(store.getState()[reduxSpeedKey])[0];
   }
   // Otherwise, assume it's a number
   else {
@@ -473,7 +473,7 @@ function getPassengersState(store) {
   let passengerList = store.getState()[reduxKey];
   // The passenger list might be wrapped in an object
   // like { passengers: ['A', 'B', 'C'] }
-  if (passengerList && typeof passengerList === 'object') {
+  if (passengerList && !Array.isArray(passengerList) && typeof passengerList === 'object') {
     passengerList = Object.values(passengerList)[0];
   }
 
