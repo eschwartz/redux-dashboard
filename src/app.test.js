@@ -347,7 +347,7 @@ it('[GENERAL] At least 2 commits', async() => {
 
   expect(
     Number(commitCount),
-    `Commit early and often!`
+    `Commit early and often! (You have ${commitCount} commits)`
   ).toBeGreaterThanOrEqual(2);
 });
 
