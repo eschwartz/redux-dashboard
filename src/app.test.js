@@ -39,20 +39,22 @@ it('Components use `connect()` to allow dispatch', async() => {
 });
 
 it('Speed: Initial speed shows as `0`', async() => {
-  let speedControl = mountWithStore(SpeedControl);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Speed Control');
 
   expect(
-    speedControl.text(),
+    app.text(),
     'Speed Control component should render "SPEED: 0" on initial load',
   ).toMatch(/0/)
 });
 
 it('Speed: Increase/Decrease buttons should update the speed on the DOM', async() => {
-  let speedControl = mountWithStore(SpeedControl);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Speed Control');
 
   // Find the "Increase/Decrease Speed" Buttons
-  let increaseButton = findIncreaseSpeedButton(speedControl);
-  let decreaseButton = findDecreaseSpeedButton(speedControl);
+  let increaseButton = findIncreaseSpeedButton(app);
+  let decreaseButton = findDecreaseSpeedButton(app);
 
 
   // Click the "Increase Speed" button 4x times
@@ -63,7 +65,7 @@ it('Speed: Increase/Decrease buttons should update the speed on the DOM', async(
 
   // Should render "SPEED: 4"
   expect(
-    speedControl.text(),
+    app.update().text(),
     'Should render "SPEED: 4" after clicking "Increase Speed" 4x times',
   ).toMatch(/4/i)
 
@@ -73,13 +75,14 @@ it('Speed: Increase/Decrease buttons should update the speed on the DOM', async(
 
   // Should render "SPEED: 2"
   expect(
-    speedControl.text(),
+    app.update().text(),
     'Should render correct speed after clicking the "Decrease Speed" button',
   ).toMatch(/2/i);
 });
 
 it('Speed: Value of speed is held in redux state', async() => {
-  let speedControl = mountWithStore(SpeedControl);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Speed Control');
 
   // Iterate through the state, and look for a `speed=0` value
   let reduxSpeedKey = Object.keys(store.getState())
@@ -124,8 +127,8 @@ it('Speed: Value of speed is held in redux state', async() => {
   ).toBe(0);
 
   // Find the "Increase/Decrease Speed" Buttons
-  let increaseButton = findIncreaseSpeedButton(speedControl);
-  let decreaseButton = findDecreaseSpeedButton(speedControl);
+  let increaseButton = findIncreaseSpeedButton(app);
+  let decreaseButton = findDecreaseSpeedButton(app);
 
   // Click the "Increase Speed" button 4x times
   increaseButton.simulate('click');
@@ -152,16 +155,17 @@ it('Speed: Value of speed is held in redux state', async() => {
 
 
 it('Passengers: Adding a passenger shows them in the DOM', async() => {
-  let passengers = mountWithStore(Passengers);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Passengers');
 
   // Enter a name into the input
-  simulateChange(passengers.find('input'), 'Dev Jana');
+  simulateChange(app.find('input'), 'Dev Jana');
 
   // Click the "Add Passenger" button
-  passengers.find('button').simulate('click');
+  app.find('button').simulate('click');
 
   // Check that passenger was added inside the <ul />
-  let lastItem = findPassengerList(passengers.update()).last();
+  let lastItem = findPassengerList(app.update()).last();
   expect(
     lastItem.length,
     'Couldn\'t find an `<li>` element for the new passenger'
@@ -173,7 +177,8 @@ it('Passengers: Adding a passenger shows them in the DOM', async() => {
 });
 
 it('Passengers: Passenger list is kept in redux state', async() => {
-  let passengers = mountWithStore(Passengers);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Passengers');
 
   // Find the passengers state in redux
 
@@ -181,8 +186,8 @@ it('Passengers: Passenger list is kept in redux state', async() => {
   let initPassengerCount = getPassengersState(store).length;
 
   // Add a passenger, via the form
-  simulateChange(passengers.find('input'), 'Dev Jana');
-  passengers.find('button').simulate('click');
+  simulateChange(app.find('input'), 'Dev Jana');
+  app.find('button').simulate('click');
 
   // Check that an item is added to the 
   // redux.passengers array
@@ -194,6 +199,7 @@ it('Passengers: Passenger list is kept in redux state', async() => {
 
 it('Dashboard: show current speed', async() => {
   let app = mountWithStore(App);
+  app = clickLink(app, 'Speed Control');
 
   // Click the  "Increase speed" x 2
   let increaseButton = findIncreaseSpeedButton(app);
@@ -213,12 +219,10 @@ it('Dashboard: show current speed', async() => {
 
 it('Dashboard: show passenger count', async() => {
   let app = mountWithStore(App);
-
-  // Navigate to the Passengers view
-  clickLink(app, 'Passengers');
+  app = clickLink(app, 'Passengers');
 
   // Add a couple passengers
-  let passengers = app.update().find('Passengers');
+  let passengers = app.find('Passengers');
   
   simulateChange(passengers.find('input'), 'Dev Jana');
   passengers.find('button').simulate('click');
@@ -247,16 +251,17 @@ it('Dashboard: show passenger count', async() => {
 });
 
 it('Reducers should not mutate state', async() => {
-  let passengers = mountWithStore(Passengers);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Passengers');
 
   // Grab the passengers list from the redux state
   let prevPassengersState = getPassengersState(store);
 
   // Add a couple of passengers
-  simulateChange(passengers.find('input'), 'Dev Jana');
-  passengers.find('button').simulate('click');
-  simulateChange(passengers.find('input'), 'Edan Schwartz');
-  passengers.find('button').simulate('click');
+  simulateChange(app.find('input'), 'Dev Jana');
+  app.find('button').simulate('click');
+  simulateChange(app.find('input'), 'Edan Schwartz');
+  app.find('button').simulate('click');
 
   // Grab the updated store.passengers value
   let nextPassengersState = getPassengersState(store);
@@ -273,9 +278,10 @@ it('Reducers should not mutate state', async() => {
 });
 
 it('[GENERAL] Passengers: Default entry with your name', async() => {
-  let passengers = mountWithStore(Passengers);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Passengers');
 
-  let passengerItems = passengers.find('ul').children('*');
+  let passengerItems = app.find('ul').children('*');
 
   expect(
     passengerItems.length,
@@ -289,17 +295,18 @@ it('[GENERAL] Passengers: Default entry with your name', async() => {
 });
 
 it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list', async() => {
-  let passengers = mountWithStore(Passengers);
+  let app = mountWithStore(App);
+  app = clickLink(app, 'Passengers');
 
   // Enter a name into the input
-  simulateChange(passengers.find('input'), 'Dev Jana');
+  simulateChange(app.find('input'), 'Dev Jana');
 
   // Click the "Add Passenger" button
-  passengers.find('button')
+  app.find('button')
     .simulate('click');
 
   expect(
-    passengers.update().find('input').instance().value,
+    app.update().find('input').instance().value,
     'Empty the <input /> value, on button click.'
   ).toBe('');
 
@@ -307,6 +314,7 @@ it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list',
 
 it('[GENERAL] HTML is valid', async() => {
   let app = mountWithStore(App);
+  app = clickLink(app, 'Speed Control');
 
   // Validate landing page (Speed Control)
   await expectValidHTML(app, 'Speed Control View');
@@ -453,6 +461,8 @@ function clickLink(wrapper, linkText) {
 
   // https://github.com/enzymejs/enzyme/issues/516
   link.simulate('click', { button: 0 });
+
+  return wrapper.update();
 }
 
 function getPassengersState(store) {
