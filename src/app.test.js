@@ -19,7 +19,16 @@ jest.mock('react-dom');
 
 // Recreate store between each test
 let store;
-beforeEach(() => store = getStore());
+let originalInitState = JSON.stringify(getStore().getState());
+beforeEach(() => {
+  store = getStore()
+
+  let initState = JSON.stringify(store.getState());
+  expect(
+    initState,
+    `Do not mutate your initial state!`
+  ).toBe(originalInitState);
+});
 
 it('Components use `connect()` to allow dispatch', async() => {
   expect(
