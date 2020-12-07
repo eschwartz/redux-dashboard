@@ -34,3 +34,9 @@
             with:
               name: testResults.json
               path: testResults.json
+          - name: Save testResults.html artifact
+            uses: actions/upload-artifact@v2
+            if: always()
+            with:
+              name: testResults.html
+              path: testResults.html
