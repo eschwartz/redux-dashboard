@@ -150,21 +150,6 @@ it('Speed: Value of speed is held in redux state', async() => {
   ).toBe(2);
 });
 
-it('Passengers: Default entry with your name', async() => {
-  let passengers = mountWithStore(Passengers);
-
-  let passengerItems = passengers.find('ul').children('*');
-
-  expect(
-    passengerItems.length,
-    'Expecting a single `<li>` element with your name in the `<Passengers />` component'
-  ).toBe(1);
-
-  expect(
-    /\w+/.test(passengerItems.text()),
-    'The `<li>` in `<Passengers />` should render your name (it appears to be empty!)'
-  ).toBe(true);
-});
 
 it('Passengers: Adding a passenger shows them in the DOM', async() => {
   let passengers = mountWithStore(Passengers);
@@ -285,6 +270,22 @@ it('Reducers should not mutate state', async() => {
      Trying using the spread operator (\`...\`), instead of \`[].push()\`
     `
   ).not.toBe(prevPassengersState);
+});
+
+it('[GENERAL] Passengers: Default entry with your name', async() => {
+  let passengers = mountWithStore(Passengers);
+
+  let passengerItems = passengers.find('ul').children('*');
+
+  expect(
+    passengerItems.length,
+    'Expecting a single `<li>` element with your name in the `<Passengers />` component'
+  ).toBe(1);
+
+  expect(
+    /\w+/.test(passengerItems.text()),
+    'The `<li>` in `<Passengers />` should render your name (it appears to be empty!)'
+  ).toBe(true);
 });
 
 it('[GENERAL] Passengers: New Passenger input is emptied, after adding to list', async() => {
