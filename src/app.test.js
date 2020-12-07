@@ -17,16 +17,34 @@ import {execSync} from 'child_process';
 // https://jestjs.io/docs/en/manual-mocks#mocking-node-modules
 jest.mock('react-dom');
 
-// Recreate store between each test
 let store;
 let originalInitState = JSON.stringify(getStore().getState());
+
 beforeEach(() => {
+  // Recreate store between each test
   store = getStore()
 
+  // If a reducer's initial state is defined outside the function definition,
+  // and then mutated, it will effect the initial state of the redux store
+  // in subsequent tests.
+  //
+  // eg:
+  //
+  // let initialSpeed = { speed: 0 }
+  // function speedReducer(state = initialSpeed, action) {
+  //   state.speed += 1;    // <-- mutates initialSpeed!
+  //   return state
+  // }
+  //
+  // There's no easy way to "reset" the state, so we'll just check
+  // if the state has changed, and warn the user about it.
   let initState = JSON.stringify(store.getState());
   expect(
     initState,
-    `Do not mutate your initial state!`
+    `WARNING: Your redux state has been mutated! 
+     Subsequent tests may fail with misleading messages.
+     
+     Avoid using \`Array.push()\`, \`+=\`, or \`-=\` operations on state.`
   ).toBe(originalInitState);
 });
 
