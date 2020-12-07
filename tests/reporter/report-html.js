@@ -95,7 +95,7 @@ module.exports = (ctx) => {
                   <div class="card-body">
                     ${escapeHTML(hint)}
                   </div>
-                `)}
+                `).join('\n<hr />\n')}
               </div>
              ` : ''
             }
@@ -122,5 +122,7 @@ function escapeHTML(s) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     // Replace `some code` with <code>some code</code>
-    .replace(/`(.*?)`/g, (_, match) => `<code>${match}</code>`);
+    .replace(/`(.*?)`/g, (_, match) => `<code>${match}</code>`)
+    // Replace newlines with <br />
+    .replace(/\n/g, '<br />');
 }
