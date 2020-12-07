@@ -115,7 +115,7 @@ it('Speed: Value of speed is held in redux state', async() => {
   let reduxSpeedKey = Object.keys(store.getState())
     // Hopefully they named their redux key something like "speed"
     // or "currentSpeed" or ....
-    .find(key => /speed/i.test(key))
+    .find(key => /speed|count/i.test(key))
 
   // Students might keep the `speed` as a number, as an object, or as an array
   // Sniff the speed data type, and try to pull out the actual numeric value
@@ -496,9 +496,7 @@ function getPassengersState(store) {
   // Iterate through the redux state,
   // and look for a key called "passengers*"
   let reduxKey = Object.keys(store.getState())
-    // Hopefully they named their redux key something like "speed"
-    // or "currentSpeed" or ....
-    .find(key => /(passenger|person|people)/i.test(key));
+    .find(key => /(passenger|person|people|name|list)/i.test(key));
 
   // Check that theres a "passenger*" key in the redux state
   expect(
