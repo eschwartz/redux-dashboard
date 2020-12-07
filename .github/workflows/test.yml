@@ -28,3 +28,8 @@
               # The CI env var is a hint to our testing scripts
               # to report results in the correct format, etc
               CI: true
+          - name: Save testResults.json artifact
+            uses: actions/upload-artifact@v2
+            with:
+              name: testResults.json
+              path: testResults.json
