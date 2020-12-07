@@ -102,6 +102,11 @@ class Reporter {
       // and log it to stdout
       let msg = reportGithubActions(ctx);
       process.stdout.write(msg);
+
+      // Write the test result JSON to a file
+      // to save as an artifact. We can load this into
+      // the portal, and use it as needed
+      fs.writeFileSync('testResults.json', JSON.stringify(ctx));
     }
     else {
       // Generate an HTML report
