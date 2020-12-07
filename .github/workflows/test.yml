@@ -30,6 +30,7 @@
               CI: true
           - name: Save testResults.json artifact
             uses: actions/upload-artifact@v2
+            if: always()
             with:
               name: testResults.json
               path: testResults.json
