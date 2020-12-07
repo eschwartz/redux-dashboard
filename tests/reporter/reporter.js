@@ -108,12 +108,11 @@ class Reporter {
       // the portal, and use it as needed
       fs.writeFileSync('testResults.json', JSON.stringify(ctx));
     }
-    else {
-      // Generate an HTML report
-      // and write it to a file
-      let html = reportHtml(ctx);
-      fs.writeFileSync('testResults.html', html, 'utf8');
-    }
+    
+    // Generate an HTML report
+    // and write it to a file
+    let html = reportHtml(ctx);
+    fs.writeFileSync('testResults.html', html, 'utf8');
   }
 }
 

@@ -33,4 +33,6 @@
             if: always()
             with:
               name: testResults
-              path: testResults.*
+              path: |
+                testResults.json
+                testResults.html
