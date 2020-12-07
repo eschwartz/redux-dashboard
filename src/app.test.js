@@ -3,8 +3,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import Passengers from './components/Passengers/Passengers';
 import SpeedControl from './components/SpeedControl/SpeedControl';
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import {default as waitFor} from 'wait-for-expect';
+import { mount } from 'enzyme';
 import {storeInstance as getStore} from './index'
 import { Provider } from 'react-redux';
 import {MemoryRouter} from 'react-router';
@@ -415,19 +414,26 @@ async function expectValidHTML(wrapper, name='App') {
 
 
 function mountWithStore(Component) {
-  let provider = mount(
-    <MemoryRouter>
-      <Provider store={store}>
-        {React.createElement(Component)}
-      </Provider>
-    </MemoryRouter>
-  );
-
   // If the component is wrapped in a Redux <Connect />,
   // we want to dive deeper into the actual component.
   let componentName = Component.WrappedComponent ?
     Component.WrappedComponent.name :
     Component.name;
+
+  let provider;
+  try {
+    provider = mount(
+      <MemoryRouter>
+        <Provider store={store}>
+          {React.createElement(Component)}
+        </Provider>
+      </MemoryRouter>
+    );
+  }
+  catch (err) {
+    expect(false, `Failed to render <${componentName} />: ${err}`)
+      .toBe(true)
+  }
 
   // Find the actual component
   return provider.find(componentName);
