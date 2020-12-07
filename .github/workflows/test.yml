@@ -28,15 +28,9 @@
               # The CI env var is a hint to our testing scripts
               # to report results in the correct format, etc
               CI: true
-          - name: Save testResults.json artifact
+          - name: Save testResults artifacts
             uses: actions/upload-artifact@v2
             if: always()
             with:
-              name: testResults.json
-              path: testResults.json
-          - name: Save testResults.html artifact
-            uses: actions/upload-artifact@v2
-            if: always()
-            with:
-              name: testResults.html
-              path: testResults.html
+              name: testResults
+              path: testResults.*
