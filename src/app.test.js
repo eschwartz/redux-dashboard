@@ -274,7 +274,7 @@ it('Dashboard: show passenger count', async() => {
   expect(
     dashboard.text(),
     'Dashboard should render the updated "PASSENGER COUNT" when you add a passenger'
-  ).toMatch(new RegExp(`PASSENGER COUNT:\\s*${passengerCount}`, 'i'));
+  ).toMatch(new RegExp(`PASSENGER.*:\\s*${passengerCount}`, 'i'));
 });
 
 it('Reducers should not mutate state', async() => {
